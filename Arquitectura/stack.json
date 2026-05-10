@@ -64,6 +64,22 @@
                 "Name": "PRD"
             }
         },
+        "FuncionesGlobalesPermisoCorreo": {
+			"Type": "AWS::Lambda::Permission",
+			"DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+			"DependsOn": [
+				"FuncionesGlobalesApiGateway",
+				"EnviarCorreoLambda"
+			],
+			"Properties": {
+				"Action": "lambda:InvokeFunction",
+				"FunctionName": {
+					"Ref": "AliasEnviarCorreoLambdaPRD"
+				},
+				"Principal": "apigateway.amazonaws.com"
+			}
+		},
         "EnviarCorreoLambda": {
             "DeletionPolicy": "Delete",
             "UpdateReplacePolicy": "Delete",
