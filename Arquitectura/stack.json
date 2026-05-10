@@ -1,5 +1,56 @@
 {
     "Resources": {
+        "FuncionesGlobalesRolLambdas": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"Path": "/",
+				"RoleName": "FuncionesGlobalesRolLambdas",
+				"Description": "Rol para las funciones globales",
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": [
+									"lambda.amazonaws.com"
+								]
+							},
+							"Action": [
+								"sts:AssumeRole"
+							]
+						}
+					]
+				},
+				"Policies": [
+					{
+						"PolicyName": "LambdaPolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [
+								{
+									"Effect": "Allow",
+									"Action": [
+										"lambda:ListFunctions",
+										"lambda:AddPermission",
+										"lambda:InvokeFunction",
+										"lambda:InvokeAsync"
+									],
+									"Resource": "*"
+								}
+							]
+						}
+					}
+				],
+				"ManagedPolicyArns": [
+					"arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+					"arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
+					"arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+					"arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+				],
+				"Tags": []
+			}
+		},
         "AliasEnviarCorreoLambdaPRD": {
             "Type": "AWS::Lambda::Alias",
             "DeletionPolicy": "Delete",
@@ -31,20 +82,39 @@
                     "Variables": {}
                 },
                 "Role": {
-                    "Ref": "LambdaRoleArn"
+                    "Fn::GetAtt": [
+                        "FuncionesGlobalesRolLambdas",
+                        "Arn"
+                    ]
                 },
-                "Tags": [],
                 "Layers": [],
                 "TracingConfig": {
                     "Mode": "Active"
                 },
                 "RuntimeManagementConfig": {
                     "UpdateRuntimeOn": "Auto"
-                }
+                },
+                "Tags": [
+                    {
+                        "Key": {
+                            "Ref": "TagKey1"
+                        },
+                        "Value": {
+                            "Ref": "TagValue1"
+                        }
+                    }
+                ]
             }
         }
     },
     "Parameters": {
-
+        "TagKey1": {
+            "Type": "String",
+            "Default": "Proyecto"
+        },
+        "TagValue1": {
+            "Type": "String",
+            "Default": "FuncionesGlobales"
+        }
     }
 }
