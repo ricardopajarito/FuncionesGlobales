@@ -117,18 +117,18 @@
                     ]
                 },
                 "Name": "FuncionesGlobalesApiGateway",
-                "Description": "Api que lleva un control los endpoints de FuncionesGlobales"
-            },
-            "Tags": [
-                {
-                    "Key": {
-                        "Ref": "TagKey1"
-                    },
-                    "Value": {
-                        "Ref": "TagValue1"
+                "Description": "Api que lleva un control los endpoints de FuncionesGlobales",
+                "Tags": [
+                    {
+                        "Key": {
+                            "Ref": "TagKey1"
+                        },
+                        "Value": {
+                            "Ref": "TagValue1"
+                        }
                     }
-                }
-            ]
+                ]
+            }
         },
         "FuncionesGlobalesCorreoResource": {
             "Type": "AWS::ApiGateway::Resource",
@@ -251,49 +251,50 @@
             ]
         },
         "FuncionesGlobalesDeploymentApiPRD": {
-			"Type": "AWS::ApiGateway::Deployment",
-			"DeletionPolicy": "Delete",
-			"UpdateReplacePolicy": "Delete",
-			"Properties": {
-				"RestApiId": {
-					"Ref": "FuncionesGlobalesApiGateway"
-				},
-				"Description": {
-					"Fn::Sub": "Deployment PRD - ${AWS::StackId}"
-				}
-			},
-			"DependsOn": [
-                "FuncionesGlobalesStageApiPRD"
-			]
-		},
-		"FuncionesGlobalesStageApiPRD": {
-			"Type": "AWS::ApiGateway::Stage",
-			"DeletionPolicy": "Delete",
-			"UpdateReplacePolicy": "Delete",
-			"Properties": {
-				"StageName": "api-prd",
-				"DeploymentId": {
-					"Ref": "FuncionesGlobalesDeploymentApiPRD"
-				},
-				"RestApiId": {
-					"Ref": "FuncionesGlobalesApiGateway"
-				},
-				"Description": "Stage PRD",
-				"Variables": {
-					"LambdaAlias": "PRD"
-				},
-				"Tags": [
-					{
-						"Key": {
-							"Ref": "TagKey1"
-						},
-						"Value": {
-							"Ref": "TagValue1"
-						}
-					}
-				]
-			}
-		}
+            "Type": "AWS::ApiGateway::Deployment",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "FuncionesGlobalesApiGateway"
+                },
+                "Description": {
+                    "Fn::Sub": "Deployment PRD - ${AWS::StackId}"
+                }
+            },
+            "DependsOn": [
+                "FuncionesGlobalesCorreoPOST",
+                "FuncionesGlobalesCorreoOPTIONS"
+            ]
+        },
+        "FuncionesGlobalesStageApiPRD": {
+            "Type": "AWS::ApiGateway::Stage",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "StageName": "api-prd",
+                "DeploymentId": {
+                    "Ref": "FuncionesGlobalesDeploymentApiPRD"
+                },
+                "RestApiId": {
+                    "Ref": "FuncionesGlobalesApiGateway"
+                },
+                "Description": "Stage PRD",
+                "Variables": {
+                    "LambdaAlias": "PRD"
+                },
+                "Tags": [
+                    {
+                        "Key": {
+                            "Ref": "TagKey1"
+                        },
+                        "Value": {
+                            "Ref": "TagValue1"
+                        }
+                    }
+                ]
+            }
+        }
     },
     "Parameters": {
         "TagKey1": {
