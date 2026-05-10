@@ -26,9 +26,8 @@ export const handler = async (event, context) => {
       throw new Error("No se proporcionó la respuesta del recaptcha.");
     }
 
-    const secretKey = config.RECAPTCHA_SECRET_KEY; // Clave secreta oculta
+    const secretKey = config.RECAPTCHA_SECRET_KEY;
 
-    // Verificar con Google
     const response = await fetch(config.URL_CAPTCHA_GOOGLE, {
       method: 'POST',
       headers: {
@@ -70,7 +69,7 @@ export const handler = async (event, context) => {
 
 async function enviarCorreo(datosFormulario, plantilla) {
 
-  let dominio = "http://agenciatwowolves.com.mx/";
+  let dominio = "https://agenciatwowolves.com.mx/";
   if (datosCorreo[dominio]) {
     let datosRemitente = datosCorreo[dominio].datosRemitente;
     let datosDestinatario = datosCorreo[dominio].datosDestinatario;
