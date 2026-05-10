@@ -1,0 +1,50 @@
+{
+    "Resources": {
+        "AliasEnviarCorreoLambdaPRD": {
+            "Type": "AWS::Lambda::Alias",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "Description": "Ambiente de PRD EnviarCorreoLambda",
+                "FunctionName": {
+                    "Ref": "EnviarCorreoLambda"
+                },
+                "FunctionVersion": "$LATEST",
+                "Name": "PRD"
+            }
+        },
+        "EnviarCorreoLambda": {
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "EnviarCorreoLambda",
+                "Handler": "app.handler",
+                "Runtime": "nodejs24.x",
+                "Code": {
+                    "ZipFile": "exports.handler = async (event, context) => {\n  return { statusCode: 200, body: 'Connected.' };\n};\n"
+                },
+                "Description": "Lambda en node 24 para enviar correos",
+                "MemorySize": 128,
+                "Timeout": 30,
+                "Environment": {
+                    "Variables": {}
+                },
+                "Role": {
+                    "Ref": "LambdaRoleArn"
+                },
+                "Tags": [],
+                "Layers": [],
+                "TracingConfig": {
+                    "Mode": "Active"
+                },
+                "RuntimeManagementConfig": {
+                    "UpdateRuntimeOn": "Auto"
+                }
+            }
+        }
+    },
+    "Parameters": {
+
+    }
+}
