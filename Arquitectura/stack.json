@@ -1,56 +1,56 @@
 {
     "Resources": {
         "FuncionesGlobalesRolLambdas": {
-			"Type": "AWS::IAM::Role",
-			"Properties": {
-				"Path": "/",
-				"RoleName": "FuncionesGlobalesRolLambdas",
-				"Description": "Rol para las funciones globales",
-				"AssumeRolePolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [
-						{
-							"Effect": "Allow",
-							"Principal": {
-								"Service": [
-									"lambda.amazonaws.com"
-								]
-							},
-							"Action": [
-								"sts:AssumeRole"
-							]
-						}
-					]
-				},
-				"Policies": [
-					{
-						"PolicyName": "LambdaPolicy",
-						"PolicyDocument": {
-							"Version": "2012-10-17",
-							"Statement": [
-								{
-									"Effect": "Allow",
-									"Action": [
-										"lambda:ListFunctions",
-										"lambda:AddPermission",
-										"lambda:InvokeFunction",
-										"lambda:InvokeAsync"
-									],
-									"Resource": "*"
-								}
-							]
-						}
-					}
-				],
-				"ManagedPolicyArns": [
-					"arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-					"arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
-					"arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-					"arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
-				],
-				"Tags": []
-			}
-		},
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/",
+                "RoleName": "FuncionesGlobalesRolLambdas",
+                "Description": "Rol para las funciones globales",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "LambdaPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "lambda:ListFunctions",
+                                        "lambda:AddPermission",
+                                        "lambda:InvokeFunction",
+                                        "lambda:InvokeAsync"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                    "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess",
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+                ],
+                "Tags": []
+            }
+        },
         "AliasEnviarCorreoLambdaPRD": {
             "Type": "AWS::Lambda::Alias",
             "DeletionPolicy": "Delete",
@@ -105,7 +105,195 @@
                     }
                 ]
             }
-        }
+        },
+        "FuncionesGlobalesApiGateway": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "EndpointConfiguration": {
+                    "Types": [
+                        "REGIONAL"
+                    ]
+                },
+                "Name": "FuncionesGlobalesApiGateway",
+                "Description": "Api que lleva un control los endpoints de FuncionesGlobales"
+            },
+            "Tags": [
+                {
+                    "Key": {
+                        "Ref": "TagKey1"
+                    },
+                    "Value": {
+                        "Ref": "TagValue1"
+                    }
+                }
+            ]
+        },
+        "FuncionesGlobalesCorreoResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "FuncionesGlobalesApiGateway"
+                },
+                "ParentId": {
+                    "Fn::GetAtt": [
+                        "FuncionesGlobalesApiGateway",
+                        "RootResourceId"
+                    ]
+                },
+                "PathPart": "correo"
+            }
+        },
+        "FuncionesGlobalesCorreoOPTIONS": {
+            "Type": "AWS::ApiGateway::Method",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "AuthorizationType": "NONE",
+                "RestApiId": {
+                    "Ref": "FuncionesGlobalesApiGateway"
+                },
+                "ResourceId": {
+                    "Ref": "FuncionesGlobalesCorreoResource"
+                },
+                "HttpMethod": "OPTIONS",
+                "Integration": {
+                    "IntegrationResponses": [
+                        {
+                            "StatusCode": "200",
+                            "ResponseParameters": {
+                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                                "method.response.header.Access-Control-Allow-Methods": "'GET,PUT,DELETE,POST,OPTIONS'",
+                                "method.response.header.Access-Control-Allow-Origin": "'*'"
+                            },
+                            "ResponseTemplates": {
+                                "application/json": ""
+                            }
+                        }
+                    ],
+                    "PassthroughBehavior": "WHEN_NO_MATCH",
+                    "RequestTemplates": {
+                        "application/json": "{\"statusCode\": 200}"
+                    },
+                    "Type": "MOCK"
+                },
+                "MethodResponses": [
+                    {
+                        "StatusCode": "200",
+                        "ResponseModels": {
+                            "application/json": "Empty"
+                        },
+                        "ResponseParameters": {
+                            "method.response.header.Access-Control-Allow-Headers": false,
+                            "method.response.header.Access-Control-Allow-Methods": false,
+                            "method.response.header.Access-Control-Allow-Origin": false
+                        }
+                    }
+                ]
+            },
+            "DependsOn": [
+                "FuncionesGlobalesCorreoResource"
+            ]
+        },
+        "FuncionesGlobalesCorreoPOST": {
+            "Type": "AWS::ApiGateway::Method",
+            "DeletionPolicy": "Delete",
+            "UpdateReplacePolicy": "Delete",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "FuncionesGlobalesApiGateway"
+                },
+                "ResourceId": {
+                    "Ref": "FuncionesGlobalesCorreoResource"
+                },
+                "HttpMethod": "POST",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                    "IntegrationHttpMethod": "POST",
+                    "Type": "AWS_PROXY",
+                    "Uri": {
+                        "Fn::Sub": [
+                            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}:${!stageVariables.LambdaAlias}/invocations",
+                            {
+                                "lambdaArn": {
+                                    "Fn::GetAtt": [
+                                        "EnviarCorreoLambda",
+                                        "Arn"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "IntegrationResponses": [
+                        {
+                            "ResponseTemplates": {},
+                            "ResponseParameters": {},
+                            "StatusCode": "200"
+                        }
+                    ],
+                    "PassthroughBehavior": "WHEN_NO_TEMPLATES"
+                },
+                "MethodResponses": [
+                    {
+                        "StatusCode": "200",
+                        "ResponseModels": {
+                            "application/pdf": "Empty"
+                        },
+                        "ResponseParameters": {}
+                    }
+                ]
+            },
+            "DependsOn": [
+                "FuncionesGlobalesCorreoResource"
+            ]
+        },
+        "FuncionesGlobalesDeploymentApiPRD": {
+			"Type": "AWS::ApiGateway::Deployment",
+			"DeletionPolicy": "Delete",
+			"UpdateReplacePolicy": "Delete",
+			"Properties": {
+				"RestApiId": {
+					"Ref": "FuncionesGlobalesApiGateway"
+				},
+				"Description": {
+					"Fn::Sub": "Deployment PRD - ${AWS::StackId}"
+				}
+			},
+			"DependsOn": [
+                "FuncionesGlobalesStageApiPRD"
+			]
+		},
+		"FuncionesGlobalesStageApiPRD": {
+			"Type": "AWS::ApiGateway::Stage",
+			"DeletionPolicy": "Delete",
+			"UpdateReplacePolicy": "Delete",
+			"Properties": {
+				"StageName": "api-prd",
+				"DeploymentId": {
+					"Ref": "FuncionesGlobalesDeploymentApiPRD"
+				},
+				"RestApiId": {
+					"Ref": "FuncionesGlobalesApiGateway"
+				},
+				"Description": "Stage PRD",
+				"Variables": {
+					"LambdaAlias": "PRD"
+				},
+				"Tags": [
+					{
+						"Key": {
+							"Ref": "TagKey1"
+						},
+						"Value": {
+							"Ref": "TagValue1"
+						}
+					}
+				]
+			}
+		}
     },
     "Parameters": {
         "TagKey1": {
