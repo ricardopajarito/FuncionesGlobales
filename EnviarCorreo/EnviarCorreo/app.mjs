@@ -13,6 +13,13 @@ export const handler = async (event, context) => {
     if (event.httpMethod !== "POST") {
       throw new Error("Método no permitido");
     }
+    let dominio = event.headers?.origin;
+
+    if (!dominio) {
+      throw new Error("No se proporcionó el dominio de origen.");
+    }
+
+    console.log("Dominio de origen:", dominio);
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     const { datosFormulario, plantilla } = body;
 
@@ -45,7 +52,7 @@ export const handler = async (event, context) => {
     }
 
     // Enviar correo
-    await enviarCorreo(datosFormulario, plantilla);
+    await enviarCorreo(datosFormulario, plantilla, dominio);
 
     statusCode = 200;
     mensaje = "Correo enviado exitosamente";
@@ -69,9 +76,8 @@ export const handler = async (event, context) => {
   return response;
 };
 
-async function enviarCorreo(datosFormulario, plantilla) {
+async function enviarCorreo(datosFormulario, plantilla, dominio) {
 
-  let dominio = "https://agenciatwowolves.com.mx/";
   if (datosCorreo[dominio]) {
     let datosRemitente = datosCorreo[dominio].datosRemitente;
     let datosDestinatario = datosCorreo[dominio].datosDestinatario;
