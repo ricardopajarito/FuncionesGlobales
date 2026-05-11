@@ -38,6 +38,8 @@ export const handler = async (event, context) => {
 
     const result = await response.json();
 
+    console.log("Respuesta del reCAPTCHA:", result);
+
     if (!result.success) {
       throw new Error("Error de validación");
     }
